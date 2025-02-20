@@ -1,18 +1,28 @@
-import { axiosInstance } from "@/lib/axios";
-import toast from "react-hot-toast";
 import { create } from "zustand";
+import toast from "react-hot-toast";
+import { axiosInstance } from "@/lib/axios";
+import { getErrorMessage } from "@/lib/utils";
 
-interface AuthStore {
-  authUser: any; // Replace 'any' with a proper user type when available
+export type User = {
+  _id: string;
+  fullName: string;
+  email: string;
+  profilePic?: string;
+  createdAt?: string;
+};
+
+export type AuthStore = {
+  authUser: User | null;
   isSigningUp: boolean;
   isLoggingIn: boolean;
   isUpdatingProfile: boolean;
   isCheckingAuth: boolean;
-  checkAuth: () => void;
+  checkAuth: () => Promise<void>;
   signup: (data: any) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   login: (data: any) => Promise<void>;
-}
+  updateProfile: (data: any) => Promise<User | void>;
+};
 
 export const useAuthStore = create<AuthStore>((set) => ({
   authUser: null,
@@ -38,9 +48,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const res = await axiosInstance.post("/auth/signup", data);
       set({ authUser: res.data });
       toast.success("Account created successfully!");
-    } catch (error: any) {
-      const errorMessage = error.response.data.message;
-      toast.error(errorMessage || "Something went wrong!");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error));
     } finally {
       set({ isSigningUp: false });
     }
@@ -52,9 +61,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const res = await axiosInstance.post("/auth/login", data);
       set({ authUser: res.data });
       toast.success("Logged in successfully!");
-    } catch (error: any) {
-      const errorMessage = error.response.data.message;
-      toast.error(errorMessage || "Something went wrong!");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error));
     } finally {
       set({ isLoggingIn: false });
     }
@@ -65,9 +73,24 @@ export const useAuthStore = create<AuthStore>((set) => ({
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
       toast.success("Logged out successfully!");
-    } catch (error: any) {
-      const errorMessage = error.response.data.message;
-      toast.error(errorMessage || "Something went wrong!");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error));
+    }
+  },
+
+  updateProfile: async (data) => {
+    try {
+      set({ isUpdatingProfile: true });
+      const res = await axiosInstance.put("/auth/update-profile", data);
+      if (res.data) {
+        set({ authUser: res.data });
+        toast.success("Profile updated successfully!");
+        return res.data;
+      }
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      set({ isUpdatingProfile: false });
     }
   },
 }));

@@ -12,7 +12,7 @@ const PORT = process.env.PORT;
 
 const app = express();
 
-app.use(express.json()); // allows to extract JSON data out of request body
+app.use(express.json({ limit: "1mb" })); // allows to extract JSON data out of request body
 app.use(cookieParser()); // allows to read the cookies
 app.use(
   cors({
@@ -23,6 +23,15 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);
+
+app.use((err, req, res, next) => {
+  if (err.type === "entity.too.large") {
+    return res.status(413).json({
+      message: "Payload too large. Please reduce the file size and try again.",
+    });
+  }
+  next(err);
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running in port ${PORT}`);
