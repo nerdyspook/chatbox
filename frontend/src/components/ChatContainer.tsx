@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useChatStore } from "@/store/useChatStore";
 import MessageInput from "@/components/MessageInput";
 import ChatHeader from "@/components/ChatHeader";
@@ -14,9 +14,17 @@ const ChatContainer = (props: Props) => {
   const { messages, getMessages, isMessagesLoading, selectedUser } =
     useChatStore();
 
+  // Create a ref to the bottom of the messages list
+  const bottomRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (selectedUser) getMessages(selectedUser._id);
   }, [selectedUser?._id, getMessages]);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   if (isMessagesLoading) {
     return (
@@ -27,8 +35,6 @@ const ChatContainer = (props: Props) => {
       </div>
     );
   }
-
-  console.log({ messages });
 
   return (
     <div className="flex flex-1 flex-col overflow-auto">
@@ -75,6 +81,9 @@ const ChatContainer = (props: Props) => {
             </div>
           );
         })}
+
+        {/* This div will be scrolled into view */}
+        <div ref={bottomRef} />
       </div>
       <MessageInput />
     </div>
