@@ -22,7 +22,7 @@ app.use(
 );
 
 app.use("/api/auth", authRoutes);
-app.use("/api/message", messageRoutes);
+app.use("/api/messages", messageRoutes);
 
 app.use((err, req, res, next) => {
   if (err.type === "entity.too.large") {

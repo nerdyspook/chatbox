@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { axiosInstance } from "@/lib/axios";
 import { getErrorMessage } from "@/lib/utils";
 
-export type User = {
+export type UserType = {
   _id: string;
   fullName: string;
   email: string;
@@ -12,16 +12,17 @@ export type User = {
 };
 
 export type AuthStore = {
-  authUser: User | null;
+  authUser: UserType | null;
   isSigningUp: boolean;
   isLoggingIn: boolean;
   isUpdatingProfile: boolean;
   isCheckingAuth: boolean;
+  onlineUsers: any[];
   checkAuth: () => Promise<void>;
   signup: (data: any) => Promise<void>;
   logout: () => Promise<void>;
   login: (data: any) => Promise<void>;
-  updateProfile: (data: any) => Promise<User | void>;
+  updateProfile: (data: any) => Promise<UserType | void>;
 };
 
 export const useAuthStore = create<AuthStore>((set) => ({
@@ -30,6 +31,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
   isLoggingIn: false,
   isUpdatingProfile: false,
   isCheckingAuth: true,
+  onlineUsers: [],
+
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
