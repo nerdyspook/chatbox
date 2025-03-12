@@ -6,11 +6,10 @@ import cors from "cors";
 import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
+import { app, server } from "./lib/socket.js";
 
 dotenv.config();
 const PORT = process.env.PORT;
-
-const app = express();
 
 app.use(express.json({ limit: "1mb" })); // allows to extract JSON data out of request body
 app.use(cookieParser()); // allows to read the cookies
@@ -33,7 +32,7 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running in port ${PORT}`);
   connectDB();
 });
