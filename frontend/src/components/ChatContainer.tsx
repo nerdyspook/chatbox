@@ -7,9 +7,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { User } from "lucide-react";
 import { formatMessageTime } from "@/lib/utils";
 
-type Props = {};
-
-const ChatContainer = (props: Props) => {
+const ChatContainer = () => {
   const { authUser } = useAuthStore();
   const {
     messages,

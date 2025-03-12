@@ -3,9 +3,7 @@ import { useChatStore } from "@/store/useChatStore";
 import { Image, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
 
-type Props = {};
-
-const MessageInput = (props: Props) => {
+const MessageInput = () => {
   const [text, setText] = useState<string>("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);

@@ -13,9 +13,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
-type Props = {};
-
-const SignupPage = (props: Props) => {
+const SignupPage = () => {
   const { isSigningUp, signup } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({

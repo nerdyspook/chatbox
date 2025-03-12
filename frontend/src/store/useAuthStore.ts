@@ -4,7 +4,8 @@ import { axiosInstance } from "@/lib/axios";
 import { getErrorMessage } from "@/lib/utils";
 import { io } from "socket.io-client";
 
-const BASE_URL = "http://localhost:5001";
+const BASE_URL =
+  import.meta.env.MODE === "development" ? "http://localhost:5001" : "/";
 
 export type UserType = {
   _id: string;
