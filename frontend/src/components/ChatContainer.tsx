@@ -11,15 +11,31 @@ type Props = {};
 
 const ChatContainer = (props: Props) => {
   const { authUser } = useAuthStore();
-  const { messages, getMessages, isMessagesLoading, selectedUser } =
-    useChatStore();
+  const {
+    messages,
+    getMessages,
+    isMessagesLoading,
+    selectedUser,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  } = useChatStore();
 
   // Create a ref to the bottom of the messages list
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (selectedUser) getMessages(selectedUser._id);
-  }, [selectedUser?._id, getMessages]);
+    if (selectedUser) {
+      getMessages(selectedUser._id);
+      subscribeToMessages();
+    }
+
+    return () => unsubscribeFromMessages();
+  }, [
+    selectedUser?._id,
+    getMessages,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  ]);
 
   // Scroll to bottom when messages change
   useEffect(() => {

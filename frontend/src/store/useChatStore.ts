@@ -1,4 +1,4 @@
-import { UserType } from "@/store/useAuthStore";
+import { useAuthStore, UserType } from "@/store/useAuthStore";
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import { getErrorMessage } from "@/lib/utils";
@@ -13,6 +13,8 @@ type ChatStore = {
   getUsers: () => Promise<void>;
   getMessages: (userId: string) => Promise<void>;
   sendMessage: (messageData: any) => Promise<void>;
+  subscribeToMessages: () => void;
+  unsubscribeFromMessages: () => void;
   setSelectedUser: (selectedUser: UserType | null) => void;
 };
 
@@ -59,6 +61,28 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     } catch (error) {
       toast.error(getErrorMessage(error));
     }
+  },
+
+  subscribeToMessages: () => {
+    const { selectedUser } = get();
+    if (!selectedUser) return;
+
+    const socket = useAuthStore.getState().socket;
+
+    socket.on("newMessage", (newMessage: any) => {
+      const isMessageSentFromSelectedUser =
+        newMessage.senderId === selectedUser._id;
+
+      if (!isMessageSentFromSelectedUser) return;
+
+      set({ messages: [...get().messages, newMessage] });
+    });
+  },
+
+  unsubscribeFromMessages: () => {
+    const socket = useAuthStore.getState().socket;
+
+    socket.off("newMessage");
   },
 
   setSelectedUser: (selectedUser: UserType | null) => set({ selectedUser }),
